@@ -1,0 +1,73 @@
+from typing import Set
+from bs4 import BeautifulSoup
+import requests
+import re
+from requests.api import get
+
+
+def get_top_batting_average(year):
+    url = 'https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/' + \
+        str(year)
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_hr(year):
+    url = 'https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/' + \
+        str(year) + "/sort/homeRuns"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_hit(year):
+    url = 'https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/' + \
+        str(year) + "/sort/hits"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_best_hitters():
+    years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020]
+    for year in years:
+        best_players = set()
+        all_eligible_players = set()
+        top_ba = get_top_batting_average(year)
+        top_hr = get_top_hr(year)
+        top_hits = get_top_hit(year)
+        all_eligible_players.update(top_ba)
+        all_eligible_players.update(top_hr)
+        all_eligible_players.update(top_hits)
+        for player in all_eligible_players:
+            if(player in top_ba and player in top_hr and player in top_hits):
+                best_players.add(player)
+            if(player in top_ba and player in top_hr):
+                best_players.add(player)
+            if(player in top_ba and player in top_hits):
+                best_players.add(player)
+            if(player in top_hr and player in top_hits):
+                best_players.add(player)
+        print(best_players)
+
+
+get_best_hitters()
