@@ -1,0 +1,216 @@
+from typing import Set
+from bs4 import BeautifulSoup
+import requests
+import re
+from requests.api import get
+
+
+def get_top_batting_average(year):
+    url = 'https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/' + \
+        str(year)
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_hr(year):
+    url = 'https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/' + \
+        str(year) + "/sort/homeRuns"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_hit(year):
+    url = 'https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/' + \
+        str(year) + "/sort/hits"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_stolen_bases(year):
+    url = "https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/" + \
+        str(year)+"/sort/stolenBases"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_caught_stealing(year):
+    url = "https://www.espn.com/mlb/history/leaders/_/breakdown/season/year/" + \
+        str(year)+"/sort/caughtStealing"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_base_stealing_effectiveness(year):
+    # I define someone being in the highest teir of stealing bases if they are in top 10 of total stolen bases andn not in the top ten of being caught stolen
+    result = []
+    stolen_bases = get_top_stolen_bases(year)
+    caught_stealing = get_top_caught_stealing(year)
+    for player in stolen_bases:
+        if player not in caught_stealing:
+            result.append(player)
+    return result
+
+
+def get_best_hitters(year):
+    best_players = set()
+    all_eligible_players = set()
+    top_ba = get_top_batting_average(year)
+    top_hr = get_top_hr(year)
+    top_hits = get_top_hit(year)
+    top_base_theives = get_top_base_stealing_effectiveness(year)
+    all_eligible_players.update(top_ba)
+    all_eligible_players.update(top_hr)
+    all_eligible_players.update(top_hits)
+    all_eligible_players.update(top_base_theives)
+    # To be considered among the best players in a year a player most be in the top ten of 2 of the 4 following categories: Batting Average, Total Hits, Total Home Runs, Base Stealing Effectivness(Defined in get_top_base_stealing_effectivenes method)
+    for player in all_eligible_players:
+        if(player in top_ba and player in top_hr and player in top_hits and top_base_theives):
+            best_players.add(player)
+        else:
+            if(player in top_ba and player in top_hr):
+                best_players.add(player)
+            if(player in top_ba and player in top_hits):
+                best_players.add(player)
+            if(player in top_hr and player in top_hits):
+                best_players.add(player)
+            if(player in top_hr and player in top_base_theives):
+                best_players.add(player)
+            if(player in top_hits and player in top_base_theives):
+                best_players.add
+            if(player in top_ba and player in top_base_theives):
+                best_players.add
+
+    return best_players
+
+
+def get_top_era(year):
+    url = "https://www.espn.com/mlb/history/leaders/_/type/pitching/breakdown/season/year/" + \
+        str(year)
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_wins(year):
+    url = "https://www.espn.com/mlb/history/leaders/_/type/pitching/breakdown/season/year/" + \
+        str(year) + "/sort/wins"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_strike_outs(year):
+    url = "https://www.espn.com/mlb/history/leaders/_/type/pitching/breakdown/season/year/" + \
+        str(year) + "/sort/strikeouts"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_hits_given(year):
+    url = "https://www.espn.com/mlb/history/leaders/_/type/pitching/breakdown/season/year/" + \
+        str(year) + "/sort/hits"
+    result = []
+    source = requests.get(url)
+    soup = BeautifulSoup(source.text, "lxml")
+    players = soup.find_all(
+        'tr', attrs={'class': re.compile('row player-10-')})
+    for i in range(0, 10):
+        stats = [stat.get_text() for stat in players[i].find_all("td")]
+        result.append(stats[1])
+    return result
+
+
+def get_top_strike_out_effectiveness(year):
+    result = []
+    # I define someone being in the highest teir of being able to strike out batter if they are in top 10 of strike outs and not in the top ten of hits given up
+    strike_outs = get_top_strike_outs(year)
+    hits = get_top_hits_given(year)
+    for player in strike_outs:
+        if(player not in hits):
+            result.append(player)
+    return result
+
+
+def get_best_pitchers(year):
+    if year == 2020 or year == 2021:
+        print("Sorry " + year + " is not availble on MLB.com")
+    else:
+        best_players = set()
+        all_eligible_players = set()
+        era = get_top_era(year)
+        wins = get_top_wins(year)
+        strike_out_effectiveness = get_top_strike_out_effectiveness(year)
+        all_eligible_players.update(era)
+        all_eligible_players.update(wins)
+        all_eligible_players.update(strike_out_effectiveness)
+        for player in all_eligible_players:
+            # To be considered among the best pitchers in a year a player most be in the top ten of 2 of the 4 following categories: Earned Run Average, Picther Wins, and Strike out Effectivness(Defined in get_strik_out_stealing_effectivenes method)
+            if(player in era and player in wins and player in strike_out_effectiveness):
+                best_players.add(player)
+            else:
+                if(player in era and player in wins):
+                    best_players.add(player)
+                if(player in era and player in strike_out_effectiveness):
+                    best_players.add(player)
+                if(player in wins and player in strike_out_effectiveness):
+                    best_players.add(player)
+    return best_players
+
+
+# Edit the years in this each method to desired year and run thr program and the results will print
+print("Pitchers:" + str(get_best_pitchers(1997)))
+print("Hitters:" + str(get_best_hitters(2016)))
